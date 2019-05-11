@@ -1,0 +1,36 @@
+{
+  "c": {
+    "preset": "",
+    "func": [
+      {
+        "print": "printf",
+        "input": "scanf"
+      }
+    ],
+    "define": [
+      {
+        "intVal": "int",
+        "floatVal": "float"
+      }
+    ],
+    "operate": {
+      "+": "+"
+    }
+  },
+  "python": {
+    "preset": "",
+    "func": [
+      {
+        "print": "print"
+      }
+    ],
+    "define": [
+      {
+        "val": ""
+      }
+    ],
+    "operate": {
+      ">": ">"
+    }
+  }
+}
