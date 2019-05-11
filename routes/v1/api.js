@@ -1,11 +1,7 @@
 var unirest = require('unirest')
-var multiparty = require('multiparty')
-var fs = require('fs')
-var Jimp = require('jimp')
 const async = require('async')
-const sharp = require('sharp')
 require('dotenv').config()
-var googleAuth = require('google-auto-auth');
+// var googleAuth = require('google-auto-auth')
 
 /**
  * convertImage
@@ -51,12 +47,14 @@ const convertImage = function (req, res) {
                 codeArr[i] = 'if(' + resultPlain + '):\n'
               } else if (checkStartCode(textResultArr[i]) == false && checkStartCode(textResultArr[i + 1]) == false) {
                 codeArr[i] = '\t' + resultPlain + '\n'
-                codeArr[i] = String(codeArr[i]).replace(/print /gm, 'print(')
-                codeArr[i] = String(codeArr[i]).replace(/!/gm, `')`)
+                codeArr[i] = String(codeArr[i]).replace(/t\'/gm, 't(\'')
+                codeArr[i] = String(codeArr[i]).replace(/\'$/gm, '\')')
+                codeArr[i] = String(codeArr[i]).toLowerCase()
               } else if (checkStartCode(textResultArr[i]) == false && checkStartCode(textResultArr[i + 1]) == true) {
                 codeArr[i] = 'else:\n\t' + resultPlain + '\n'
-                codeArr[i] = String(codeArr[i]).replace(/print /gm, 'print(')
-                codeArr[i] = String(codeArr[i]).replace(/!/gm, `')`)
+                codeArr[i] = String(codeArr[i]).replace(/t\'/gm, 't(\'')
+                codeArr[i] = String(codeArr[i]).replace(/\'$/gm, '\')')
+                codeArr[i] = String(codeArr[i]).toLowerCase()
               } else if (checkStartCode(textResultArr[i]) == true && checkStartCode(textResultArr[i + 1]) == true) {
                 codeArr[i] = resultPlain + '\n'
               }
