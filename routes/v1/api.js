@@ -1,7 +1,6 @@
 var unirest = require('unirest')
 const async = require('async')
 require('dotenv').config()
-// var googleAuth = require('google-auto-auth')
 
 /**
  * convertImage
@@ -27,8 +26,8 @@ const convertImage = function (req, res) {
   } = req.body
   async.waterfall([
     (callback) => {
-      unirest.post('https://vision.googleapis.com/v1/images:annotate')
-        .header('Authorization', 'Bearer ya29.GlwHB1BBsKApWM-MxjUtLLKesbW_isoRIt6Aj_Ktj9RGO3wmYBOVyf8cKtbem6nWa6aFBi9iV0rNoNTxTg0Nr5VibvlvAee2x2BcQrdoh2RcGlIZlsXAjp7_Ys3mOg')
+      var token = process.env.GOOGLE_CLOUD_API_KEY
+      unirest.post(`https://vision.googleapis.com/v1/images:annotate?key=${token}`)
         .header('Content-Type', 'application/json; charset=utf-8')
         .send(`{'requests':[{'image':{'source':{'imageUri':'${img_url}'}},'features':[{'type':'DOCUMENT_TEXT_DETECTION'}]}]}`)
         .end(function (result) {
@@ -60,13 +59,15 @@ const convertImage = function (req, res) {
               }
               console.log(codeArr[i])
             }
+            var plaintext = ''
             for (var i = 0; i < codeArr.length; i ++) {
               codeArr[i] = codeArr[i].replace(/(^\s*)|(\s*$)/, '')
               if (codeArr[i].length == 0) {
                 codeArr.splice(i, 1)
               }
+              plaintext += codeArr[i]
             }
-            callback(null, codeArr)
+            callback(null, plaintext)
           } else {
             callback('err')
           }
@@ -83,23 +84,6 @@ const convertImage = function (req, res) {
 }
 
 module.exports.convertImage = convertImage
-
-// function getToken () {
-//   var authConfig = {};
-
-//   // path to a key:
-//   authConfig.keyFilename = __dirname + '/../../CODRAW-f9fa2cb0d75b.json';
-
-//   // Create a client
-//   var auth = googleAuth(authConfig);
-
-//   auth.authorizeRequest({/*...*/}, function (err, authorizedReqOpts) {})
-//   auth.getToken(function (err, token) {
-//     console.log('aaa')
-//     console.log(token)
-//     return token
-//   })
-// }
 
 function checkStartCode (command) {
   if (String(command).split('.').length - 1 == 1) { 
@@ -129,13 +113,17 @@ const runCode = function (req, res) {
     code,
     language
   } = req.body
+  var language_id
+  if (language == 'python') {
+    language_id = '34'
+  }
   async.waterfall([
     (callback) => {
       unirest.post('https://judge0.p.rapidapi.com/submissions')
         .header('X-RapidAPI-Host', 'judge0.p.rapidapi.com')
         .header('X-RapidAPI-Key', process.env.RAPID_API_KEY)
         .header('Content-Type', 'application/json')
-        .send({'source_code':'#include <stdio.h>\n\nint main(void) {\n  printf(\'hello, world\\n\');\n  return 0;\n}','language_id':'4'})
+        .send({'source_code': code,'language_id': language_id})
         .end(function (result) {
           if (result) {
             callback(null, {token: result.body.token})
